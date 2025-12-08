@@ -8,19 +8,14 @@ defmodule Day2 do
 
   def part_a do
     parse_part_a()
-    |> Enum.map(&num_invalid/1)
+    |> Enum.map(&num_invalid_a/1)
     |> Enum.sum()
   end
 
-  @spec num_invalid({integer(), integer()}) :: integer()
-  def num_invalid(rng) do
+  @spec num_invalid_a({integer(), integer()}) :: integer()
+  def num_invalid_a(rng) do
     {min, max} = rng
-    Enum.reduce(min..max, 0, fn x, total -> total + if(is_invalid(x), do: x, else: 0) end)
-  end
-
-  @spec is_invalid(integer()) :: boolean()
-  def is_invalid(num) do
-    halves_equal?(num)
+    Enum.reduce(min..max, 0, fn x, total -> total + if(halves_equal?(x), do: x, else: 0) end)
   end
 
   @spec halves_equal?(integer()) :: boolean()
