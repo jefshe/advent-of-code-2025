@@ -2,8 +2,13 @@ defmodule Day1 do
   @type input() :: {:left | :right, integer()}
 
   def run do
+    IO.puts("Day 1")
+
+    part_a()
+    |> IO.inspect(label: "part_a")
+
     part_b()
-    |> IO.inspect()
+    |> IO.inspect(label: "part_b")
   end
 
   def part_a do
@@ -60,7 +65,6 @@ defmodule Day1 do
     |> String.split("\n")
     |> Enum.map(fn line -> String.trim(line) end)
     |> Enum.filter(fn line -> line != "" end)
-    |> IO.inspect()
     |> Enum.map(fn line ->
       <<direction::utf8, rest::binary>> = line
 

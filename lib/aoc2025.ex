@@ -1,5 +1,6 @@
 defmodule Aoc2025 do
   def run do
-    IO.puts(Day1.run())
+    Day1.run()
+    Day2.run()
   end
 end
