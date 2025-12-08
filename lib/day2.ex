@@ -4,6 +4,9 @@ defmodule Day2 do
 
     part_a()
     |> IO.inspect(label: "part_a")
+
+    part_b()
+    |> IO.inspect(label: "part_b")
   end
 
   def part_a do
@@ -12,10 +15,22 @@ defmodule Day2 do
     |> Enum.sum()
   end
 
+  def part_b do
+    parse_part_a()
+    |> Enum.map(&num_invalid_b/1)
+    |> Enum.sum()
+  end
+
   @spec num_invalid_a({integer(), integer()}) :: integer()
   def num_invalid_a(rng) do
     {min, max} = rng
     Enum.reduce(min..max, 0, fn x, total -> total + if(halves_equal?(x), do: x, else: 0) end)
+  end
+
+  @spec num_invalid_b({integer(), integer()}) :: integer()
+  def num_invalid_b(rng) do
+    {min, max} = rng
+    Enum.reduce(min..max, 0, fn x, total -> total + if(is_repeating?(x), do: x, else: 0) end)
   end
 
   @spec halves_equal?(integer()) :: boolean()
@@ -31,7 +46,28 @@ defmodule Day2 do
     end
   end
 
-  def part_b do
+  @spec is_repeating?(integer()) :: boolean()
+  def is_repeating?(num) do
+    digits = Integer.digits(num) |> List.to_tuple()
+    is_repeating?(digits, 1)
+  end
+
+  @spec is_repeating?(tuple(), integer()) :: boolean()
+  def is_repeating?(digits, chunk_size) do
+    case chunk_size do
+      chunk_size when chunk_size > tuple_size(digits) / 2 ->
+        false
+
+      chunk_size when rem(tuple_size(digits), chunk_size) != 0 ->
+        is_repeating?(digits, chunk_size + 1)
+
+      _ ->
+        Enum.all?(0..(tuple_size(digits) - chunk_size)//chunk_size, fn i ->
+          Enum.all?(i..(i + chunk_size - 1), fn j ->
+            elem(digits, j) == elem(digits, rem(j, chunk_size))
+          end)
+        end) or is_repeating?(digits, chunk_size + 1)
+    end
   end
 
   def parse_part_a() do
