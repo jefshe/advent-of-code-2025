@@ -13,8 +13,9 @@ defmodule Day4 do
     grid = parse_part_a()
     {x_size, y_size} = Nx.shape(grid.shape)
     for y <- 0..(y_size-1), x<-0..(x_size-1) do
-      IO.puts(Nx.to_number(grid[x: x][y: y]))
+      IO.puts("#{x}, #{y}: #{grid[x: x][y: y]}")
     end
+    Nx.to_heatmap(grid)
   end
 
   def part_b do
