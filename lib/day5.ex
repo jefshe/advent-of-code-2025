@@ -11,7 +11,10 @@ defmodule Day5 do
 
   def part_a do
     {ranges, ingredients} = parse_part(:a)
-    ingredients |> Enum.filter(fn x -> Enum.any?(ranges, fn r -> x in r end) end) |> Enum.count()
+
+    ingredients
+    |> Enum.filter(fn x -> Enum.any?(ranges, fn r -> x in r end) end)
+    |> Enum.count()
   end
 
   def part_b do
