@@ -3,4 +3,8 @@ defmodule Utils do
     {:ok, file} = File.read("inputs/day#{day}/#{part}.txt")
     file
   end
+  def read_file_stream(day, part, lines_or_bytes \\ :line) do
+    File.stream!("inputs/day#{day}/#{part}.txt", lines_or_bytes)
+    |> Stream.map(&String.trim/1)
+  end
 end
