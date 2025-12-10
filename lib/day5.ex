@@ -16,7 +16,10 @@ defmodule Day5 do
 
   def part_b do
     {ranges, _} = parse_part(:a)
+
     find_disjoint_ranges(ranges)
+    |> Enum.map(&Range.size/1)
+    |> Enum.sum()
   end
 
   def find_disjoint_ranges(ranges) do
@@ -34,8 +37,6 @@ defmodule Day5 do
           )
       end
     end)
-    |> Enum.map(&Range.size/1)
-    |> Enum.sum()
   end
 
   @spec parse_part(:a | :b | :ex) :: {[Range.t()], [integer()]}
