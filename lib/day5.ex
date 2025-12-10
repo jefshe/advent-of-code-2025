@@ -12,34 +12,33 @@ defmodule Day5 do
   def part_a do
     {ranges, ingredients} = parse_part(:a)
 
-    ingredients
-    |> Enum.filter(fn x -> Enum.any?(ranges, fn r -> x in r end) end)
-    |> Enum.count()
+    Enum.count(ingredients, fn x ->
+      Enum.any?(ranges, &(x in &1))
+    end)
   end
 
   def part_b do
     {ranges, _} = parse_part(:a)
 
-    find_disjoint_ranges(ranges)
+    deduplicate_ranges(ranges)
     |> Enum.map(&Range.size/1)
     |> Enum.sum()
   end
 
-  def find_disjoint_ranges(ranges) do
+  def deduplicate_ranges(ranges) do
     ranges
     |> Enum.sort()
-    |> Enum.reduce([], fn r, acc ->
-      case {r, acc} do
-        {r, []} ->
-          [r]
+    |> Enum.reduce([], &add_or_merge/2)
+  end
 
-        {r_start..r_end//_, [last_start..last_end//_ | rest]} ->
-          if(Range.disjoint?(r_start..r_end, last_start..last_end),
-            do: [r | acc],
-            else: [min(r_start, last_start)..max(r_end, last_end) | rest]
-          )
-      end
-    end)
+  defp add_or_merge(range, []), do: [range]
+
+  defp add_or_merge(_..last//_ = range, [head_first..head_last//_ = head | tail]) do
+    if Range.disjoint?(range, head) do
+      [range, head | tail]
+    else
+      [head_first..max(last, head_last) | tail]
+    end
   end
 
   @spec parse_part(:a | :b | :ex) :: {[Range.t()], [integer()]}
@@ -48,11 +47,10 @@ defmodule Day5 do
       Utils.read_file_stream(5, part)
       |> Enum.split_while(&(&1 != ""))
 
-    ranges =
-      rangestrings
-      |> Enum.map(&string_to_range/1)
+    ranges = Enum.map(rangestrings, &string_to_range/1)
+    ingredients = Enum.map(ingredients, &String.to_integer/1)
 
-    {ranges, ingredients |> Enum.map(&String.to_integer/1)}
+    {ranges, ingredients}
   end
 
   @spec string_to_range(String.t()) :: Range.t()

@@ -1,6 +1,6 @@
 defmodule Day4 do
   def run do
-    IO.puts("Day 3")
+    IO.puts("Day 4")
 
     part_a()
     |> IO.inspect(label: "part_a")
