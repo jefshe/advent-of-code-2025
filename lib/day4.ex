@@ -32,12 +32,46 @@ defmodule Day4 do
       end
 
     Enum.sum(found)
-
-    # Nx.to_heatmap(grid)
   end
 
   def part_b do
-    # parse_part_a()
+    grid = parse_part_a()
+    {x_size, y_size} = Nx.shape(grid.shape)
+    {x_max, y_max} = {x_size - 1, y_size - 1}
+    remove_rolls(grid, x_max, y_max)
+  end
+
+  def remove_rolls(grid, x_max, y_max) do
+    removed =
+      for y <- 0..y_max, x <- 0..x_max do
+        if(
+          Nx.to_number(grid[x: x][y: y]) == 1 and
+            grid[x: max(x - 1, 0)..min(x + 1, x_max)][
+              y: max(y - 1, 0)..min(y + 1, y_max)
+            ]
+            |> Nx.sum()
+            |> Nx.to_number() <= 4,
+          do: Nx.tensor([y, x]),
+          else: nil
+        )
+      end
+      |> Enum.reject(&is_nil/1)
+
+    total = removed |> Enum.count()
+
+    removed_grid =
+      removed
+      |> Enum.reduce(grid, fn xy, old ->
+        Nx.indexed_put(old, xy, 0)
+      end)
+
+    case total do
+      0 ->
+        0
+
+      cnt ->
+        cnt + remove_rolls(removed_grid, x_max, y_max)
+    end
   end
 
   def parse_part_a() do
