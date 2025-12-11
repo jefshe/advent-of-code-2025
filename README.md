@@ -1,6 +1,7 @@
 # Aoc2025
 
-**TODO: Add description**
+AOC 2025 - Attempted all in a language I'd like to learn - elixir :D
+
 
 ## Installation
 
