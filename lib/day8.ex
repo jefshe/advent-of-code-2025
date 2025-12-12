@@ -11,11 +11,12 @@ defmodule Day8 do
 
   def part_a do
     connect_n = 1000
+
     graph =
       parse_part(:a)
       |> unique_pairs()
       |> Enum.reduce([], fn {{ax, ay, az} = a, {bx, by, bz} = b}, acc ->
-        [{{a, b}, (ax - bx)**2 + (ay - by)**2 + (az - bz)**2} | acc]
+        [{{a, b}, (ax - bx) ** 2 + (ay - by) ** 2 + (az - bz) ** 2} | acc]
       end)
       |> Enum.sort(fn {_, a}, {_, b} -> a <= b end)
       |> Enum.take(connect_n)
@@ -24,25 +25,38 @@ defmodule Day8 do
         Graph.add_edge(graph, a, b)
       end)
 
-    Graph.components(graph) |> Enum.map(&Enum.count/1) |> Enum.sort(:desc) |> Enum.take(3) |> IO.inspect() |> Enum.product()
+    Graph.components(graph)
+    |> Enum.map(&Enum.count/1)
+    |> Enum.sort(:desc)
+    |> Enum.take(3)
+    |> Enum.product()
   end
 
   def part_b do
-    connect_n = 1000
-    graph =
-      parse_part(:a)
+    list = parse_part(:a)
+
+    connections =
+      list
       |> unique_pairs()
       |> Enum.reduce([], fn {{ax, ay, az} = a, {bx, by, bz} = b}, acc ->
-        [{{a, b}, (ax - bx)**2 + (ay - by)**2 + (az - bz)**2} | acc]
+        [{{a, b}, (ax - bx) ** 2 + (ay - by) ** 2 + (az - bz) ** 2} | acc]
       end)
       |> Enum.sort(fn {_, a}, {_, b} -> a <= b end)
-      |> Enum.take(connect_n)
       |> Enum.map(fn {nodes, _} -> nodes end)
-      |> Enum.reduce(Graph.new(), fn {a, b}, graph ->
-        Graph.add_edge(graph, a, b)
-      end)
 
-    Graph.components(graph) |> Enum.map(&Enum.count/1) |> Enum.sort(:desc) |> Enum.take(3) |> IO.inspect() |> Enum.product()
+    connect_up(Graph.new(type: :undirected), connections, Enum.count(list))
+  end
+
+  @spec connect_up(Graph.t(), nonempty_maybe_improper_list(), number()) ::
+          {non_neg_integer(), any()}
+  def connect_up(g, [{a, b} | rest], size) do
+    new_g = Graph.add_edge(g, a, b)
+    [span_set | _] = Graph.components(new_g)
+
+    case Enum.count(span_set) do
+      cnt when cnt == size -> elem(a, 0) * elem(b, 0)
+      _ -> connect_up(new_g, rest, size)
+    end
   end
 
   def unique_pairs(list) do
