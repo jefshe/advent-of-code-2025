@@ -10,31 +10,22 @@ defmodule Day8 do
   end
 
   def part_a do
-    pq = PriorityQueue.new()
-    connect_n = 10
-
-    pq =
+    connect_n = 1000
+    graph =
       parse_part(:a)
       |> unique_pairs()
-      |> Enum.reduce(pq, fn {x, y}, acc ->
-        PriorityQueue.push(
-          acc,
-          {Nx.to_list(x), Nx.to_list(y)},
-          Nx.subtract(x, y) |> Nx.pow(2) |> Nx.sum() |> Nx.to_number()
-        )
+      |> Enum.reduce([], fn {x, y}, acc ->
+        [{{Nx.to_list(x), Nx.to_list(y)}, Nx.subtract(x, y) |> Nx.pow(2) |> Nx.sum() |> Nx.to_number()} | acc]
+      end)
+      |> Enum.sort(fn {_, a}, {_, b} -> a <= b end)
+      |> Enum.take(connect_n)
+      |> IO.inspect()
+      |> Enum.map(fn {nodes, _} -> nodes end)
+      |> Enum.reduce(Graph.new(), fn {a, b}, graph ->
+        Graph.add_edge(graph, a, b)
       end)
 
-    {graph, _} =
-      Enum.reduce(1..connect_n, {Graph.new(), pq}, fn _, {graph, pq} ->
-        add_connected_nodes(graph, pq)
-      end)
-
-    graph
-  end
-
-  def add_connected_nodes(graph, pq) do
-    {{:value, {a, b}}, new_pq} = PriorityQueue.pop(pq)
-    {Graph.add_edge(graph, a, b), new_pq}
+    Graph.components(graph) |> Enum.map(&Enum.count/1) |> Enum.sort(:desc) |> Enum.take(3) |> IO.inspect() |> Enum.product()
   end
 
   def part_b do
